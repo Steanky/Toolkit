@@ -131,7 +131,7 @@ public final class Iterators {
         }
     }
 
-    private static final class SingletonIterator<T>implements Iterator<T> {
+    private static final class SingletonIterator<T> implements Iterator<T> {
         private T element;
         boolean iterated;
 
