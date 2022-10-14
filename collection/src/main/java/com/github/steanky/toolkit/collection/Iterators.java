@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 /**
  * Contains utility methods relating to {@link Iterator}, {@link Iterable}, and {@link Collection}.
  */
-public final class CollectionUtils {
+public final class Iterators {
     private static final Iterator<Object> EMPTY_ITERATOR = new Iterator<>() {
         @Override
         public boolean hasNext() {
@@ -31,7 +31,7 @@ public final class CollectionUtils {
      * @param <T> the element type of the iterator
      */
     @SuppressWarnings("unchecked")
-    public static <T> @NotNull Iterator<T> emptyIterator() {
+    public static <T> @NotNull Iterator<T> iterator() {
         return (Iterator<T>) EMPTY_ITERATOR;
     }
 
@@ -42,7 +42,7 @@ public final class CollectionUtils {
      * @param <T> the element type of the iterable
      */
     @SuppressWarnings("unchecked")
-    public static <T> @NotNull Iterable<T> emptyIterable() {
+    public static <T> @NotNull Iterable<T> iterable() {
         return (Iterable<T>) EMPTY_ITERABLE;
     }
 
@@ -53,8 +53,30 @@ public final class CollectionUtils {
      * @return a new iterator containing a single value
      * @param <T> the type of value held in the iterator
      */
-    public static <T> @NotNull Iterator<T> singletonIterator(T element) {
+    public static <T> @NotNull Iterator<T> iterator(T element) {
         return new SingletonIterator<>(element);
+    }
+
+    /**
+     * Produces an {@link Iterator} from the provided elements.
+     *
+     * @param elements the elements array
+     * @return an iterator over the elements
+     * @param <T> the type of element to store in the iterator
+     */
+    @SafeVarargs
+    public static <T> @NotNull Iterator<T> iterator(T ... elements) {
+        if (elements.length == 0) {
+            //return the empty iterator if possible
+            return iterator();
+        }
+
+        if (elements.length == 1) {
+            //return a singleton iterator containing the only element of this array
+            return new SingletonIterator<>(elements[0]);
+        }
+
+        return new ArrayIterator<>(elements);
     }
 
     /**
@@ -64,8 +86,28 @@ public final class CollectionUtils {
      * @return a new iterable containing a single value
      * @param <T> the type of value held in the iterable
      */
-    public static <T> @NotNull Iterable<T> singletonIterable(T element) {
-        return () -> singletonIterator(element);
+    public static <T> @NotNull Iterable<T> iterable(T element) {
+        return () -> new SingletonIterator<>(element);
+    }
+
+    /**
+     * Produces an {@link Iterable} from the provided elements.
+     *
+     * @param elements the elements array
+     * @return an iterable over the elements
+     * @param <T> the type of element to store in the iterable
+     */
+    @SafeVarargs
+    public static <T> @NotNull Iterable<T> iterable(T ... elements) {
+        if (elements.length == 0) {
+            return iterable();
+        }
+
+        if (elements.length == 1) {
+            return () -> new SingletonIterator<>(elements[0]);
+        }
+
+        return () -> new ArrayIterator<>(elements);
     }
 
     /**
@@ -112,6 +154,29 @@ public final class CollectionUtils {
             T elementCopy = element;
             element = null;
             return elementCopy;
+        }
+    }
+
+    private static final class ArrayIterator<T> implements Iterator<T> {
+        private final T[] array;
+        private int i;
+
+        private ArrayIterator(T @NotNull [] array) {
+            this.array = array;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return i < array.length;
+        }
+
+        @Override
+        public T next() {
+            if (i >= array.length) {
+                throw new NoSuchElementException("Array index " + i + " out of bounds for length " + array.length);
+            }
+
+            return array[i++];
         }
     }
 }
