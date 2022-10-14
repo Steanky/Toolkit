@@ -1,4 +1,4 @@
-package com.github.steanky.ethylene.core.util;
+package com.github.steanky.toolkit.function;
 
 /**
  * A {@link Runnable}-like function which may throw an exception.
