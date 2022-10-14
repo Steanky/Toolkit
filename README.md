@@ -15,7 +15,7 @@ A simple utility library for Java. Very lightweight and modular.
 
 ## Background
 
-I got annoye re-writing the same utility boilerplate across multiple projects.  This project is designed to help de-duplicate general, nonspecific utility code. 
+I got annoyed re-writing the same utility boilerplate across multiple projects.  This project is designed to help de-duplicate general, nonspecific utility code. 
 
 ## Install
 
