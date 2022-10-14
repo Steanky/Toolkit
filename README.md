@@ -1,14 +1,8 @@
-# Template
+# Toolkit
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-A standard template repository for my Java projects.
-
-This repository contains:
-
-1. Initial build files to ease multi-module development
-2. A default license
-3. A default .editorconfig
+A simple utility library for Java. Very lightweight and modular. 
 
 ## Table of Contents
 
@@ -21,37 +15,15 @@ This repository contains:
 
 ## Background
 
-This repository began when I got tired of duplicating all my initial code for new products.
+I got annoye re-writing the same utility boilerplate across multiple projects.  This project is designed to help de-duplicate general, nonspecific utility code. 
 
 ## Install
 
-As a template repository, users are expected to generate their own repositories from this one using GitHub's template repository feature.
+There will be Cloudsmith releases published soon (tm). Users can clone the repository, and build manually using the provided Gradle wrapper.
 
 ## Usage
 
-Template uses Java 17 and Gradle 7.4 by default.
-
-### Gradle Plugins
-
-Template specifies a few plugins in `buildSrc`: `java-conventions` and `library-conventions`. Modules should generally rely on one or the other as follows (in their respective `build.gradle.kts`): 
-
-```kotlin
-plugins {
-    id("template.java-conventions")
-}
-```
-
-One can edit the plugin scripts in `buildSrc` to apply build configuration changes globally across all modules that use them.
-
-`java-conventions` specifies the Maven public repository, as well as some dependencies: junit-jupiter, mockito, and jetbrains-annotations. It also configures the `Jar` task to copy the module or project license into any built jars.
-
-`java-library` supplies everything in `java-conventions`, with the addition of also producing javadoc and source jars.
-
-### Gradle Modules
-
-By default, there is a single module, `template-java`, that is included by default. Module names should be prefixed by the root project name (`template` being the default). Module *directory* names should not have this prefix.
-
-Assuming `git` is available from the command line, the buildscript will automatically generate (and add) a new `.gitignore` file which excludes the `./build` directory (relative to each module). 
+Toolkit uses Java 17 and Gradle 7.4.
 
 ## Maintainers
 
