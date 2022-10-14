@@ -1,3 +1,3 @@
 plugins {
-    id("template.java-conventions")
+    id("template.java-library-conventions")
 }
