@@ -2,27 +2,13 @@ package com.github.steanky.toolkit.collection;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Contains utility methods relating to {@link Iterator}, {@link Iterable}, and {@link Collection}.
  */
 public final class Iterators {
-    private static final Iterator<Object> EMPTY_ITERATOR = new Iterator<>() {
-        @Override
-        public boolean hasNext() {
-            return false;
-        }
-
-        @Override
-        public Object next() {
-            throw new NoSuchElementException();
-        }
-    };
-
-    private static final Iterable<?> EMPTY_ITERABLE = () -> EMPTY_ITERATOR;
+    private static final Iterable<?> EMPTY_ITERABLE = Collections::emptyIterator;
 
     /**
      * Returns the common empty {@link Iterator}.
@@ -30,9 +16,8 @@ public final class Iterators {
      * @return the common empty iterator
      * @param <T> the element type of the iterator
      */
-    @SuppressWarnings("unchecked")
     public static <T> @NotNull Iterator<T> iterator() {
-        return (Iterator<T>) EMPTY_ITERATOR;
+        return Collections.emptyIterator();
     }
 
     /**
@@ -129,6 +114,33 @@ public final class Iterators {
                 collection.add(element);
             }
         }
+    }
+
+    /**
+     * Returns a read-only view of the provided array. If the array is modified, the returned list will reflect the
+     * changes.
+     *
+     * @param array the underlying array
+     * @return a read-only view of the array
+     * @param <T> the component type of the array
+     */
+    public static <T> @NotNull List<T> arrayView(T @NotNull [] array) {
+        Objects.requireNonNull(array);
+        if (array.length == 0) {
+            return Collections.emptyList();
+        }
+
+        return new AbstractList<>() {
+            @Override
+            public T get(int index) {
+                return array[index];
+            }
+
+            @Override
+            public int size() {
+                return array.length;
+            }
+        };
     }
 
     private static final class SingletonIterator<T> implements Iterator<T> {
