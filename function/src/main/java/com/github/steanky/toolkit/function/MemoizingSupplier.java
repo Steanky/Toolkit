@@ -35,8 +35,8 @@ public final class MemoizingSupplier<T> implements Supplier<T> {
     @Override
     public T get() {
         if (!hasData) {
-            cached = supplier.get();
             hasData = true;
+            cached = supplier.get();
         }
 
         return cached;
