@@ -3,6 +3,7 @@ package com.github.steanky.toolkit.collection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Contains utility methods relating to {@link Iterator}, {@link Iterable}, and {@link Collection}.
@@ -143,9 +144,112 @@ public final class Iterators {
         };
     }
 
+    /**
+     * Creates a mapped view of the given collection. The returned value is read-through. During iteration, the
+     * provided function is used to appropriately map the element types.
+     *
+     * @param mapper the mapper function
+     * @param original the original collection
+     * @return the mapped view collection
+     * @param <T> the upper bounds of the original collection
+     * @param <R> the component type of the mapped collection
+     */
+    static <T, R> @NotNull Collection<R> mappedView(@NotNull Function<? super T, ? extends R> mapper,
+            @NotNull Collection<? extends T> original) {
+        Objects.requireNonNull(mapper);
+        Objects.requireNonNull(original);
+
+        return new AbstractCollection<>() {
+            @Override
+            public Iterator<R> iterator() {
+                return new Iterator<>() {
+                    private final Iterator<? extends T> iterator = original.iterator();
+
+                    @Override
+                    public boolean hasNext() {
+                        return iterator.hasNext();
+                    }
+
+                    @Override
+                    public R next() {
+                        return mapper.apply(iterator.next());
+                    }
+                };
+            }
+
+            @Override
+            public int size() {
+                return original.size();
+            }
+        };
+    }
+
+    /**
+     * Works the same as {@link Iterators#mappedView(Function, Collection)}, but uses an array instead of a collection.
+     *
+     * @param mapper the mapper function
+     * @param original the original array
+     * @return a mapped view of the array
+     * @param <T> the upper bounds of the original collection
+     * @param <R> the component type of the mapped collection
+     */
+    static <T, R> @NotNull Collection<R> mappedView(@NotNull Function<? super T, ? extends R> mapper,
+            @NotNull T[] original) {
+        Objects.requireNonNull(mapper);
+        Objects.requireNonNull(original);
+
+        return new AbstractCollection<>() {
+            @Override
+            public Iterator<R> iterator() {
+                return new Iterator<>() {
+                    private int i;
+
+                    @Override
+                    public boolean hasNext() {
+                        return i < original.length;
+                    }
+
+                    @Override
+                    public R next() {
+                        return mapper.apply(original[i++]);
+                    }
+                };
+            }
+
+            @Override
+            public int size() {
+                return original.length;
+            }
+        };
+    }
+
+    /**
+     * Converts a potentially modifiable iterator (one which supports the {@link Iterator#remove()} method) to one that
+     * does not.
+     *
+     * @param iterator the iterator to wrap
+     * @return an unmodifiable iterator
+     * @param <T> the type of object held in the iterator
+     */
+    public static <T> @NotNull Iterator<T> unmodifiableIterator(@NotNull Iterator<T> iterator) {
+        Objects.requireNonNull(iterator);
+
+        return new Iterator<>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public T next() {
+                return iterator.next();
+            }
+        };
+    }
+
     private static final class SingletonIterator<T> implements Iterator<T> {
-        private T element;
-        boolean iterated;
+        private final T element;
+        private boolean iterated;
 
         private SingletonIterator(T element) {
             this.element = element;
@@ -163,9 +267,7 @@ public final class Iterators {
             }
 
             iterated = true;
-            T elementCopy = element;
-            element = null;
-            return elementCopy;
+            return element;
         }
     }
 
