@@ -154,7 +154,7 @@ public final class Iterators {
      * @param <T> the upper bounds of the original collection
      * @param <R> the component type of the mapped collection
      */
-    static <T, R> @NotNull Collection<R> mappedView(@NotNull Function<? super T, ? extends R> mapper,
+    public static <T, R> @NotNull Collection<R> mappedView(@NotNull Function<? super T, ? extends R> mapper,
             @NotNull Collection<? extends T> original) {
         Objects.requireNonNull(mapper);
         Objects.requireNonNull(original);
@@ -193,12 +193,17 @@ public final class Iterators {
      * @param <T> the upper bounds of the original collection
      * @param <R> the component type of the mapped collection
      */
-    static <T, R> @NotNull Collection<R> mappedView(@NotNull Function<? super T, ? extends R> mapper,
+    public static <T, R> @NotNull List<R> mappedView(@NotNull Function<? super T, ? extends R> mapper,
             @NotNull T[] original) {
         Objects.requireNonNull(mapper);
         Objects.requireNonNull(original);
 
-        return new AbstractCollection<>() {
+        return new AbstractList<>() {
+            @Override
+            public R get(int index) {
+                return mapper.apply(original[index]);
+            }
+
             @Override
             public Iterator<R> iterator() {
                 return new Iterator<>() {
