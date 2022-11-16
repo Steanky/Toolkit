@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.github.steanky"
-version = "0.1.3"
+version = "0.1.4"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))

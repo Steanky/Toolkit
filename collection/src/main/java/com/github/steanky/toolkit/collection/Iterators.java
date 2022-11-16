@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Contains utility methods relating to {@link Iterator}, {@link Iterable}, and {@link Collection}.
@@ -128,20 +130,10 @@ public final class Iterators {
     public static <T> @NotNull List<T> arrayView(T @NotNull [] array) {
         Objects.requireNonNull(array);
         if (array.length == 0) {
-            return Collections.emptyList();
+            return List.of();
         }
 
-        return new AbstractList<>() {
-            @Override
-            public T get(int index) {
-                return array[index];
-            }
-
-            @Override
-            public int size() {
-                return array.length;
-            }
-        };
+        return new ViewList<>(array);
     }
 
     /**
@@ -296,6 +288,56 @@ public final class Iterators {
             }
 
             return array[i++];
+        }
+    }
+
+    private static final class ViewList<T> extends AbstractList<T> implements RandomAccess {
+        private final T[] array;
+
+        private ViewList(T[] array) {
+            this.array = array;
+        }
+
+        @Override
+        public T get(int index) {
+            return array[index];
+        }
+
+        @Override
+        public int size() {
+            return array.length;
+        }
+
+        @Override
+        public Stream<T> stream() {
+            return Arrays.stream(array);
+        }
+
+        @Override
+        public Stream<T> parallelStream() {
+            return Arrays.stream(array).parallel();
+        }
+
+        @NotNull
+        @Override
+        public Object @NotNull [] toArray() {
+            return Arrays.copyOf(array, array.length);
+        }
+
+        @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
+        @NotNull
+        @Override
+        public <T1> T1 @NotNull [] toArray(T1 [] a) {
+            if (a.length < array.length) {
+                return (T1[]) Arrays.copyOf(array, array.length, a.getClass());
+            }
+
+            System.arraycopy(array, 0, a, 0, array.length);
+            if (a.length > array.length) {
+                a[array.length] = null;
+            }
+
+            return a;
         }
     }
 }
