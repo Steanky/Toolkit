@@ -1,11 +1,11 @@
 package com.github.steanky.toolkit.collection;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Contains utility methods relating to {@link Iterator}, {@link Iterable}, and {@link Collection}.
@@ -122,12 +122,18 @@ public final class Iterators {
     /**
      * Returns a read-only view of the provided array. If the array is modified, the returned list will reflect the
      * changes.
-     *
+     * <p>
+     * The returned list cannot be modified (other than by modifying the array). It is designed to act as an extremely
+     * lightweight wrapper around the array, and most operations (when possible) interact directly with the array. In
+     * particular, any of its iterators may throw {@link IndexOutOfBoundsException} instead of
+     * {@link NoSuchElementException} if {@link Iterator#next()} is called more times than the length of the array.
+     * <p>
+     * The length of the list may never change.
      * @param array the underlying array
      * @return a read-only view of the array
      * @param <T> the component type of the array
      */
-    public static <T> @NotNull List<T> arrayView(T @NotNull [] array) {
+    public static <T> @NotNull @UnmodifiableView List<T> arrayView(T @NotNull [] array) {
         Objects.requireNonNull(array);
         if (array.length == 0) {
             return List.of();
@@ -268,26 +274,72 @@ public final class Iterators {
         }
     }
 
-    private static final class ArrayIterator<T> implements Iterator<T> {
-        private final T[] array;
-        private int i;
+    private static class ArrayIterator<T> implements Iterator<T> {
+        protected final T[] array;
+        protected int cursor;
 
-        private ArrayIterator(T @NotNull [] array) {
+        private ArrayIterator(T[] array, int cursor) {
             this.array = array;
+            this.cursor = cursor;
+        }
+
+        private ArrayIterator(T[] array) {
+            this(array, 0);
         }
 
         @Override
         public boolean hasNext() {
-            return i < array.length;
+            return cursor < array.length;
         }
 
         @Override
         public T next() {
-            if (i >= array.length) {
-                throw new NoSuchElementException("Array index " + i + " out of bounds for length " + array.length);
-            }
+            return array[cursor++];
+        }
+    }
 
-            return array[i++];
+    private static final class ArrayListIterator<T> extends ArrayIterator<T> implements ListIterator<T> {
+        private ArrayListIterator(T[] array, int cursor) {
+            super(array, cursor);
+        }
+
+        private ArrayListIterator(T[] array) {
+            this(array, 0);
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return cursor != 0;
+        }
+
+        @Override
+        public T previous() {
+            return array[--cursor];
+        }
+
+        @Override
+        public int nextIndex() {
+            return cursor;
+        }
+
+        @Override
+        public int previousIndex() {
+            return cursor - 1;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void set(T t) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void add(T t) {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -322,6 +374,22 @@ public final class Iterators {
         @Override
         public Object @NotNull [] toArray() {
             return Arrays.copyOf(array, array.length);
+        }
+
+        @Override
+        public @NotNull Iterator<T> iterator() {
+            return new ArrayIterator<>(array);
+        }
+
+        @Override
+        public @NotNull ListIterator<T> listIterator() {
+            return new ArrayListIterator<>(array);
+        }
+
+        @Override
+        public @NotNull ListIterator<T> listIterator(int index) {
+            Objects.checkIndex(index, array.length + 1);
+            return new ArrayListIterator<>(array, index);
         }
 
         @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
