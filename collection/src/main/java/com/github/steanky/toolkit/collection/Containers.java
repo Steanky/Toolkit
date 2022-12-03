@@ -6,7 +6,6 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
 public final class Containers {
@@ -166,7 +165,6 @@ public final class Containers {
             return Arrays.stream(array).parallel();
         }
 
-        @NotNull
         @Override
         public Object @NotNull [] toArray() {
             Object[] copy = new Object[array.length];
