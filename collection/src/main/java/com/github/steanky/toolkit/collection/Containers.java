@@ -3,8 +3,10 @@ package com.github.steanky.toolkit.collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
 public final class Containers {
@@ -103,7 +105,7 @@ public final class Containers {
      * @param <R> the component type of the mapped collection
      */
     public static <T, R> @NotNull List<R> mappedView(@NotNull Function<? super T, ? extends R> mapper,
-            @NotNull T[] original) {
+            T @NotNull [] original) {
         Objects.requireNonNull(mapper);
         Objects.requireNonNull(original);
 
@@ -167,7 +169,9 @@ public final class Containers {
         @NotNull
         @Override
         public Object @NotNull [] toArray() {
-            return Arrays.copyOf(array, array.length);
+            Object[] copy = new Object[array.length];
+            System.arraycopy(array, 0, copy, 0, array.length);
+            return copy;
         }
 
         @Override
@@ -187,11 +191,12 @@ public final class Containers {
         }
 
         @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
-        @NotNull
         @Override
         public <T1> T1 @NotNull [] toArray(T1 [] a) {
             if (a.length < array.length) {
-                return (T1[]) Arrays.copyOf(array, array.length, a.getClass());
+                T1[] newArray = (T1[]) Array.newInstance(a.getClass().getComponentType(), array.length);
+                System.arraycopy(array, 0, newArray, 0, array.length);
+                return newArray;
             }
 
             System.arraycopy(array, 0, a, 0, array.length);

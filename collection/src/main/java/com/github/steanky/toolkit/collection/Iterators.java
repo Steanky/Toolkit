@@ -190,6 +190,7 @@ public final class Iterators {
                 throw new NoSuchElementException();
             }
 
+            iterated = false;
             return element;
         }
 

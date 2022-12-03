@@ -2,6 +2,7 @@ package com.github.steanky.toolkit.collection;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -123,20 +124,27 @@ class BasicWrapper<T> extends AbstractList<T> implements Wrapper<T>, RandomAcces
         return true;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T1> T1[] toArray(IntFunction<T1[]> generator) {
-        Object[] array = generator.apply(1);
-
-        //may generate ArrayStoreException as per the specification
-        array[0] = value;
-        return (T1[]) array;
-    }
-
     @Override
     public Object @NotNull [] toArray() {
-        Object[] array = new Object[1];
-        array[0] = value;
+        return new Object[] {
+                value
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T1> T1 @NotNull [] toArray(@NotNull T1 @NotNull [] array) {
+        if (array.length == 0) {
+            Object[] newArray = (Object[]) Array.newInstance(array.getClass().getComponentType(), 1);
+            newArray[0] = value;
+            return (T1[]) newArray;
+        }
+
+        ((Object[]) array)[0] = value;
+        if (array.length > 1) {
+            ((Object[]) array)[1] = null;
+        }
+
         return array;
     }
 
