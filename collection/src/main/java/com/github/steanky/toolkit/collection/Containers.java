@@ -8,6 +8,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Utility class containing methods for working with {@link Collection}s, {@link Iterable}s, and arrays.
+ */
 public final class Containers {
 
     /**
