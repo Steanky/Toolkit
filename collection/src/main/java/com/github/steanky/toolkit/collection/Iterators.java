@@ -238,10 +238,12 @@ public final class Iterators {
     static class ArrayIterator<T> implements Iterator<T> {
         protected final T[] array;
         protected int cursor;
+        protected int lastRet;
 
         ArrayIterator(T[] array, int cursor) {
             this.array = array;
             this.cursor = cursor;
+            this.lastRet = -1;
         }
 
         @Override
@@ -251,7 +253,7 @@ public final class Iterators {
 
         @Override
         public T next() {
-            return array[cursor++];
+            return array[lastRet = cursor++];
         }
     }
 
@@ -267,7 +269,7 @@ public final class Iterators {
 
         @Override
         public T previous() {
-            return array[--cursor];
+            return array[lastRet = --cursor];
         }
 
         @Override
@@ -308,7 +310,7 @@ public final class Iterators {
 
         @Override
         public void set(T t) {
-            array[cursor] = t;
+            array[lastRet] = t;
         }
 
         @Override
