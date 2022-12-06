@@ -43,11 +43,6 @@ public final class Iterators {
             return iterator();
         }
 
-        if (elements.length == 1) {
-            //return a singleton iterator containing the only element of this array
-            return new SingletonIterator<>(elements[0]);
-        }
-
         return new ArrayIterator<>(elements, 0);
     }
 
@@ -87,11 +82,6 @@ public final class Iterators {
             return listIterator();
         }
 
-        if (elements.length == 1) {
-            //return a singleton iterator containing the only element of this array
-            return new SingletonListIterator<>(elements[0]);
-        }
-
         return new ArrayListIterator<>(elements, 0);
     }
 
@@ -108,7 +98,7 @@ public final class Iterators {
     }
 
     /**
-     * Produces an {@link ListIterator} from the provided elements. It will be immutable. The element(s) (if length is
+     * Produces an {@link ListIterator} from the provided elements. It will be mutable. The element(s) (if length is
      * non-zero) may be changed using {@link ListIterator#set(Object)}. Any changes made this way will be visible in the
      * given array. Likewise, any changes in the array will be visible in the iterator.
      *
@@ -118,11 +108,6 @@ public final class Iterators {
      */
     @SafeVarargs
     public static <T> @NotNull ListIterator<T> mutableListIterator(T ... elements) {
-        if (elements.length == 0) {
-            //return the empty iterator if possible
-            return listIterator();
-        }
-
         return new MutableArrayListIterator<>(elements, 0);
     }
 
