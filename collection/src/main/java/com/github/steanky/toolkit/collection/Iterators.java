@@ -221,29 +221,37 @@ public final class Iterators {
     }
 
     static class MutableSingletonListIterator<T> extends SingletonListIterator<T> {
+        private boolean started;
+
         MutableSingletonListIterator(T element) {
             super(element);
         }
 
         @Override
         public void set(T t) {
-            if (!iterated) {
+            if (!started) {
+                //necessary to comply with ListIterator's spec
                 throw new IllegalStateException();
             }
 
             element = t;
+        }
+
+        @Override
+        public T next() {
+            T val = super.next();
+            started = true;
+            return val;
         }
     }
 
     static class ArrayIterator<T> implements Iterator<T> {
         protected final T[] array;
         protected int cursor;
-        protected int lastRet;
 
         ArrayIterator(T[] array, int cursor) {
             this.array = array;
             this.cursor = cursor;
-            this.lastRet = -1;
         }
 
         @Override
@@ -253,7 +261,7 @@ public final class Iterators {
 
         @Override
         public T next() {
-            return array[lastRet = cursor++];
+            return array[cursor++];
         }
     }
 
@@ -269,7 +277,7 @@ public final class Iterators {
 
         @Override
         public T previous() {
-            return array[lastRet = --cursor];
+            return array[--cursor];
         }
 
         @Override
@@ -299,8 +307,21 @@ public final class Iterators {
     }
 
     static final class MutableArrayListIterator<T> extends ArrayListIterator<T> {
+        private int lastRet;
+
         MutableArrayListIterator(T[] array, int cursor) {
             super(array, cursor);
+            this.lastRet = -1;
+        }
+
+        @Override
+        public T next() {
+            return array[lastRet = cursor++];
+        }
+
+        @Override
+        public T previous() {
+            return array[lastRet = --cursor];
         }
 
         @Override

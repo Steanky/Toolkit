@@ -11,10 +11,32 @@ import java.util.function.Supplier;
  * This can be used in the context of multiple potentially exception-throwing operations, where the failure of one
  * operation should not prevent the others from running. To this end, it contains convenience methods which accept
  * variations of various interfaces in the {@link java.util.function} package which throw exceptions.
+ * <p>
+ * This class implements the {@link AutoCloseable} interface, and can therefore be used with a try-with-resources block.
+ * When an ExceptionHandler is <i>closed</i>, either automatically or by explicitly calling
+ * {@link ExceptionHandler#close()}, any exception that was previously set or suppressed will be thrown.
+ * <p>
+ * Below is an example of how this could be used:
+ *
+ * <pre>
+ * {@code
+ *     public static void deleteChildren(Path dir) throws IOException {
+ *         try (ExceptionHandler<IOException> handler = new ExceptionHandler<>(IOException.class)) {
+ *             try (Stream<Path> pathStream = Files.list(dir)) {
+ *                 pathStream.forEach(path -> handler.run(() -> Files.deleteIfExists(path)));
+ *             }
+ *         }
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * This code ensures that an attempt is made to delete all files in the given directory; however, any and all exceptions
+ * that occur while doing this will be batched and thrown afterwards.
+ * <p>
  *
  * @param <TErr> the type of exception to be handled
  */
-public final class ExceptionHandler<TErr extends Exception> {
+public final class ExceptionHandler<TErr extends Exception> implements AutoCloseable {
     private final Class<TErr> exceptionClass;
 
     private TErr exception;
@@ -39,7 +61,7 @@ public final class ExceptionHandler<TErr extends Exception> {
     }
 
     /**
-     * Throws the set exception, if it exists.
+     * Throws the set exception, if it exists. This method is directly called by {@link ExceptionHandler#close()}.
      *
      * @throws TErr the exception type
      */
@@ -147,5 +169,10 @@ public final class ExceptionHandler<TErr extends Exception> {
         }
 
         return defaultSupplier.get();
+    }
+
+    @Override
+    public void close() throws TErr {
+        throwIfPresent();
     }
 }
