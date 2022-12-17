@@ -37,7 +37,7 @@ public final class Iterators {
      * @param <T> the type of element to store in the iterator
      */
     @SafeVarargs
-    public static <T> @NotNull Iterator<T> iterator(T ... elements) {
+    public static <T> @NotNull Iterator<T> iterator(T @NotNull ... elements) {
         if (elements.length == 0) {
             //return the empty iterator if possible
             return iterator();

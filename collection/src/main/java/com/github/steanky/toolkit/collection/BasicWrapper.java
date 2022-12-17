@@ -36,7 +36,8 @@ class BasicWrapper<T> extends AbstractList<T> implements Wrapper<T>, RandomAcces
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(get());
+        T value = this.value;
+        return 31 + (value == null ? 0 : value.hashCode());
     }
 
     @Override
@@ -52,6 +53,26 @@ class BasicWrapper<T> extends AbstractList<T> implements Wrapper<T>, RandomAcces
         if (obj instanceof Wrapper<?> other) {
             return Objects.equals(get(), other.get());
         }
+        else if (obj instanceof List<?> other) {
+            Iterator<?> itr = other.iterator();
+
+            Object otherVal = null;
+            boolean itrOnce = false;
+            while (itr.hasNext()) {
+                if (itrOnce) {
+                    return false;
+                }
+
+                otherVal = itr.next();
+                itrOnce = true;
+            }
+
+            if (!itrOnce) {
+                return false;
+            }
+
+            return Objects.equals(get(), otherVal);
+        }
 
         return false;
     }
@@ -65,6 +86,12 @@ class BasicWrapper<T> extends AbstractList<T> implements Wrapper<T>, RandomAcces
     public T get(int index) {
         Objects.checkIndex(index, 1);
         return value;
+    }
+
+    @Override
+    public T set(int index, T element) {
+        Objects.checkIndex(index, 1);
+        return value = element;
     }
 
     @Override

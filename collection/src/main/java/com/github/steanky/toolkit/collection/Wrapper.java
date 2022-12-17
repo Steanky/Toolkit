@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  * {@link Wrapper#ofNull()}.</p>
  *
  * <p>Wrappers can also be treated as immutable-length {@link List}s with a size of 1, whose single element may be
- * replaced but never removed. Correspondingly, methods like {@link List#set(int, Object)}, {@link List#remove(int)}
+ * replaced but never removed. Correspondingly, methods like {@link List#add(Object)}, {@link List#remove(int)}
  * will generally not be implemented (because they imply that the length of the list is changed).</p>
  * The object stored in the wrapper may be changed using {@link Wrapper#set(Object)}.
  * @param <T> the type of object held in the wrapper
