@@ -51,27 +51,21 @@ class BasicWrapper<T> extends AbstractList<T> implements Wrapper<T>, RandomAcces
         }
 
         if (obj instanceof Wrapper<?> other) {
-            return Objects.equals(get(), other.get());
+            return Objects.equals(value, other.get());
         }
         else if (obj instanceof List<?> other) {
             Iterator<?> itr = other.iterator();
 
-            Object otherVal = null;
-            boolean itrOnce = false;
-            while (itr.hasNext()) {
-                if (itrOnce) {
-                    return false;
-                }
-
-                otherVal = itr.next();
-                itrOnce = true;
-            }
-
-            if (!itrOnce) {
+            if (!itr.hasNext()) { //empty list, not equal to us
                 return false;
             }
 
-            return Objects.equals(get(), otherVal);
+            Object first = itr.next();
+            if (itr.hasNext()) { //list has more than one element, not equal to us
+                return false;
+            }
+
+            return Objects.equals(value, first); //list reported only one element, compare for equality
         }
 
         return false;

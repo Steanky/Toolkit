@@ -17,16 +17,19 @@ import java.util.function.Supplier;
  * {@link AtomicReference} is mutable but is primarily designed for use in a multithreaded context. Single-length
  * arrays can be used but lack convenience methods and interoperability with Java utility classes.</p>
  *
- * <p>Wrapper instances are considered equal if and only if the objects they contain are equal. Likewise, a wrapper's
- * hashcode is equal to the hashcode of the stored object, or 0 if {@code null}.</p>
+ * <p>Wrapper instances are considered equal if and only if the objects they contain are equal. Wrappers can be equal to
+ * arbitrary {@link List}s, if the list is single-length, and the list element is equal to the value stored in the
+ * wrapper.</p>
  *
  * <p>Wrapper instances can be obtained through the static factory method {@link Wrapper#of(Object)} or
  * {@link Wrapper#ofNull()}.</p>
  *
  * <p>Wrappers can also be treated as immutable-length {@link List}s with a size of 1, whose single element may be
- * replaced but never removed. Correspondingly, methods like {@link List#add(Object)}, {@link List#remove(int)}
- * will generally not be implemented (because they imply that the length of the list is changed).</p>
- * The object stored in the wrapper may be changed using {@link Wrapper#set(Object)}.
+ * replaced but never removed. Correspondingly, methods like {@link List#add(Object)}, {@link List#add(int, Object)} or
+ * {@link List#remove(int)} should not be implemented (because they imply that the length of the list is changed).</p>
+ *
+ * The object stored in the wrapper may be changed using {@link Wrapper#set(Object)} or {@link List#set(int, Object)}
+ * with an index of 0.
  * @param <T> the type of object held in the wrapper
  */
 public interface Wrapper<T> extends Supplier<T>, List<T> {
