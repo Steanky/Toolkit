@@ -12,7 +12,7 @@ import java.util.stream.Stream;
  *
  * @param <T> the type of object held in this wrapper
  */
-class BasicWrapper<T> extends AbstractList<T> implements Wrapper<T>, RandomAccess {
+final class WrapperImpl<T> extends AbstractList<T> implements Wrapper<T>, RandomAccess {
     private T value;
 
     /**
@@ -20,7 +20,7 @@ class BasicWrapper<T> extends AbstractList<T> implements Wrapper<T>, RandomAcces
      *
      * @param initialValue the initial value for this wrapper
      */
-    BasicWrapper(T initialValue) {
+    WrapperImpl(T initialValue) {
         this.value = initialValue;
     }
 

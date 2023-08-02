@@ -3,10 +3,11 @@ package com.github.steanky.toolkit.collection;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BasicWrapperTest {
+class WrapperImplTest {
     @SuppressWarnings("SimplifiableAssertion")
     @Test
     void equalsHashCodeCompatibleWithList() {
@@ -24,5 +25,18 @@ class BasicWrapperTest {
 
         assertFalse(wrapper.equals(unequalList), "wrapper equals unequal list");
         assertFalse(unequalList.equals(wrapper), "unequal list equals wrapper");
+    }
+
+    @Test
+    void unmodifiableSupplier() {
+        Wrapper<String> wrapper = Wrapper.of("test");
+        Supplier<String> stringSupplier = wrapper.unmodifiableView();
+
+        assertThrows(ClassCastException.class, () -> {
+            Wrapper<?> wrapper1 = (Wrapper<?>)stringSupplier;
+        });
+
+        wrapper.set("new");
+        assertEquals("new", stringSupplier.get());
     }
 }

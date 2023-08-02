@@ -2,6 +2,7 @@ package com.github.steanky.toolkit.collection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +33,7 @@ import java.util.function.Supplier;
  * with an index of 0.
  * @param <T> the type of object held in the wrapper
  */
-public interface Wrapper<T> extends Supplier<T>, List<T> {
+public sealed interface Wrapper<T> extends Supplier<T>, List<T> permits WrapperImpl {
     /**
      * Sets the value underlying this wrapper.
      *
@@ -51,6 +52,16 @@ public interface Wrapper<T> extends Supplier<T>, List<T> {
     }
 
     /**
+     * Converts this mutable wrapper into an unmodifiable view as a {@link Supplier}. Unlike simply passing this wrapper
+     * wherever a supplier is required, the returned object cannot be cast back into a wrapper and modified.
+     * @return an unmodifiable supplier
+     */
+    @SuppressWarnings("FunctionalExpressionCanBeFolded")
+    default @NotNull @UnmodifiableView Supplier<T> unmodifiableView() {
+        return this::get;
+    }
+
+    /**
      * Applies a mapping function to this wrapper's value, and returns a new wrapper containing the result of this
      * function. The contents of this wrapper are not changed.
      *
@@ -60,7 +71,7 @@ public interface Wrapper<T> extends Supplier<T>, List<T> {
      */
     default <U> @NotNull Wrapper<U> map(@NotNull Function<? super T, ? extends U> mapper) {
         Objects.requireNonNull(mapper);
-        return new BasicWrapper<>(mapper.apply(get()));
+        return new WrapperImpl<>(mapper.apply(get()));
     }
 
     /**
@@ -83,7 +94,7 @@ public interface Wrapper<T> extends Supplier<T>, List<T> {
      * @param <T> the value type
      */
     static <T> @NotNull Wrapper<T> of(T initialValue) {
-        return new BasicWrapper<>(initialValue);
+        return new WrapperImpl<>(initialValue);
     }
 
     /**
@@ -93,6 +104,6 @@ public interface Wrapper<T> extends Supplier<T>, List<T> {
      * @param <T> the value type
      */
     static <T> @NotNull Wrapper<T> ofNull() {
-        return new BasicWrapper<>(null);
+        return new WrapperImpl<>(null);
     }
 }
