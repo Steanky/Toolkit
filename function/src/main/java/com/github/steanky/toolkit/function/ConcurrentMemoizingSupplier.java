@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  *
  * @param <T> the type of object returned by the supplier
  */
-public final class ConcurrentMemozingSupplier<T> implements Supplier<T> {
+public final class ConcurrentMemoizingSupplier<T> implements Supplier<T> {
     private final Supplier<? extends T> supplier;
 
     private volatile T cache;
@@ -25,7 +25,7 @@ public final class ConcurrentMemozingSupplier<T> implements Supplier<T> {
      *
      * @param supplier the delegate supplier (must be non-null)
      */
-    public ConcurrentMemozingSupplier(@NotNull Supplier<? extends T> supplier) {
+    public ConcurrentMemoizingSupplier(@NotNull Supplier<? extends T> supplier) {
         this.supplier = Objects.requireNonNull(supplier);
     }
 
